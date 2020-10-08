@@ -12,6 +12,5 @@ docker exec -it doc-converter libreoffice --nologo --headless --convert-to "$2" 
 
 outputFile="${originalFile%.*}".pdf
 docker cp doc-converter:/"$outputFile" ./
-docker exec -it doc-converter rm "$originalFile" "$outputFile"
 
 docker stop doc-converter
