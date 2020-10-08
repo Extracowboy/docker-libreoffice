@@ -1,16 +1,12 @@
 #!/bin/bash
-#
 # $1 - file to convert
-# $2 - convert to [pdf, html, etc]
+# $2 - convert to [pdf, html, etc] (default - pdf)
 
-docker start doc-converter
+absolutePath=$(realpath $1)
+mountDir="${absolutePath%/*}"
+originalFile="${absolutePath##*/}"
 
-originalFileFullPath=$1
-originalFile="${originalFileFullPath##*/}"
-docker cp $1 doc-converter:/"$originalFile"
-docker exec -it doc-converter libreoffice --nologo --headless --convert-to "$2" /"$originalFile"
-
-outputFile="${originalFile%.*}".pdf
-docker cp doc-converter:/"$outputFile" ./
-
-docker stop doc-converter
+docker run -it --rm \
+  --mount type=bind,source="$mountDir",target=/tmp \
+  alpine-libreoffice \
+  libreoffice --nologo --headless --convert-to "$2" /tmp/"$originalFile" --outdir /tmp
